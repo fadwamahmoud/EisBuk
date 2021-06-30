@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import _ from "lodash";
 import CustomerForm from "../../components/customers/CustomerForm";
 
 import {
@@ -16,7 +15,6 @@ import {
   TableContainer,
   TableBody,
   TableHead,
-  TablePagination,
   TableRow,
   TextField,
 } from "@material-ui/core";
@@ -29,30 +27,17 @@ export const CustomerList = ({
   onDeleteCustomer,
   updateCustomer,
 }) => {
-  const [page, setPage] = useState(0);
   const [searchString, setSearchString] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(15);
   const [customerCurrentlyEdited, setCustomerCurrentlyEdited] = useState(null);
   const [customerCurrentlyDeleted, setCustomerCurrentlyDeleted] = useState(
     null
   );
   const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false);
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, customers.length - page * rowsPerPage);
+
   const searchRe = new RegExp(searchString, "i");
-  const customersToShow = _.slice(
-    customers,
-    rowsPerPage * page,
-    rowsPerPage * (page + 1)
-  ).filter((el) => searchRe.test(el.name) || searchRe.test(el.surname));
-  const rowsPerPageOptions = [10, 15, 50, 100];
+  const customersToShow = customers.filter(
+    (el) => searchRe.test(el.name) || searchRe.test(el.surname)
+  );
   const history = useHistory();
 
   return (
@@ -121,23 +106,9 @@ export const CustomerList = ({
                 </TableRow>
               );
             })}
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 33 * emptyRows }}>
-                <TableCell colSpan={8} />
-              </TableRow>
-            )}
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        component="div"
-        count={customers.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onChangePage={handleChangePage}
-        rowsPerPageOptions={rowsPerPageOptions}
-        onChangeRowsPerPage={handleChangeRowsPerPage}
-      />
       <CustomerForm
         open={Boolean(customerCurrentlyEdited)}
         handleClose={() => setCustomerCurrentlyEdited(null)}
